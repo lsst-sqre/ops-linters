@@ -1,4 +1,5 @@
 import logging
+from pprint import pprint
 
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
@@ -16,20 +17,19 @@ projects = [
     'plasma-geode-127520',
 ]
 
-# Name of the region for this request.
-region = 'us-central1'
 
-
-def lookup_addresses(project, region):
+def lookup_addresses(project):
     addresses = []
-    request = service.addresses().list(project=project, region=region)
+    request = service.addresses().aggregatedList(project=project)
     while request is not None:
         response = request.execute()
 
-        for address in response['items']:
-            addresses.append(address['address'])
+        for name, addresses_scoped_list in response['items'].items():
+            if 'addresses' in addresses_scoped_list:
+                for address in addresses_scoped_list['addresses']:
+                    addresses.append(address['address'])
 
-        request = service.addresses().list_next(previous_request=request, previous_response=response)
+        request = service.addresses().aggregatedList_next(previous_request=request, previous_response=response)
 
     return addresses
 
@@ -37,7 +37,7 @@ def lookup_all_addresses():
     all_addresses = []
 
     for p in projects:
-        addresses = lookup_addresses(p, region)
+        addresses = lookup_addresses(p)
 
         for a in addresses:
             all_addresses.append(a)

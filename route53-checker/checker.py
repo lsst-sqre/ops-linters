@@ -7,7 +7,40 @@ logging.basicConfig(level=logging.INFO)
 client = boto3.client('route53')
 
 
-def list_all_resource_record_sets(zone_id) -> Dict:
+def list_all_hosted_zones() -> List:
+    logging.info("Getting hosted zones...")
+
+    marker = None
+    truncated = True
+    all_zones = []
+
+    response = client.list_hosted_zones()
+
+    for zone in response['HostedZones']:
+        all_zones.append(zone)
+
+    truncated = response['IsTruncated']
+    if truncated:
+        marker = response['NextMarker']
+
+    while truncated:
+        response = client.list_hosted_zones(Marker=marker)
+
+        for zone in response['HostedZones']:
+            all_zones.append(zone)
+
+        truncated = response['IsTruncated']
+
+        if truncated:
+            marker = response['NextMarker']
+
+    for z in all_zones:
+        logging.info(z['Name'])
+    logging.info("Found %d zones" % len(all_zones))
+
+    return all_zones
+
+def list_all_resource_record_sets(zone_id, zone_name) -> Dict:
     """Returns all the resource record sets, including if they are
     truncated and we have to make another request."""
     all_recordsets = []
@@ -32,39 +65,30 @@ def list_all_resource_record_sets(zone_id) -> Dict:
             all_recordsets.append(r)
 
 
-    logging.info("Printing all recordsets")
-    logging.info(all_recordsets)
     return all_recordsets
 
 
-def query_dns_records() -> Dict:
+def query_dns_records(zones) -> Dict:
     """Query all the DNS records for the zones lsst.cloud and lsst.codes.
     This returns a dict that is keyed on hostname and the value is a list
     of IP addresses associated with that hostname."""
 
-    logging.info("Getting hosted zones...")
-    response = client.list_hosted_zones()
     lookup = {}
 
-    for zone in response['HostedZones']:
+    for zone in zones:
         zone_name = zone['Name']
 
-        if zone_name not in ['lsst.cloud.', 'lsst.codes.']:
-            continue
+        #if zone_name not in ['lsst.cloud.', 'lsst.codes.']:
+        #    continue
 
         logging.info(zone_name)
-        logging.info(zone)
-        all_recordsets = list_all_resource_record_sets(zone['Id'])
-        logging.info(all_recordsets)
+        all_recordsets = list_all_resource_record_sets(zone['Id'], zone['Name'])
 
         for recordset in all_recordsets:
             if 'ResourceRecords' in recordset:
                 records = recordset['ResourceRecords']
 
                 if recordset['Type'] == 'A':
-                    logging.debug(recordset)
-                    logging.debug(records)
-                    
                     name = recordset['Name']
                     addresses = []
 
@@ -76,6 +100,6 @@ def query_dns_records() -> Dict:
 
     return lookup
 
-
-hosts = query_dns_records()
+zones = list_all_hosted_zones()
+hosts = query_dns_records(zones)
 logging.info(hosts)

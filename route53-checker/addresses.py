@@ -44,6 +44,6 @@ def lookup_all_addresses():
 
     return all_addresses
 
-
-all_addresses = lookup_all_addresses()
-logging.info(all_addresses)
+if __name__ == "__main__":
+    all_addresses = lookup_all_addresses()
+    logging.info(all_addresses)

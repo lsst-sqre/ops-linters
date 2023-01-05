@@ -102,8 +102,9 @@ def query_dns_records(zones) -> Dict:
 
     return lookup
 
-zones = list_all_hosted_zones()
-hosts = query_dns_records(zones)
+if __name__ == "__main__":
+    zones = list_all_hosted_zones()
+    hosts = query_dns_records(zones)
 
-for h in hosts:
-    logging.info(f"{h}: {hosts[h]}")
+    for h in hosts:
+        logging.info(f"{h}: {hosts[h]}")

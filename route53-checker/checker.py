@@ -78,8 +78,10 @@ def query_dns_records(zones) -> Dict:
     for zone in zones:
         zone_name = zone['Name']
 
-        #if zone_name not in ['lsst.cloud.', 'lsst.codes.']:
-        #    continue
+        # Limit zones that we're searching to lsst.cloud and lsst.codes,
+        # to avoid IT managed zones.
+        if zone_name not in ['lsst.cloud.', 'lsst.codes.']:
+            continue
 
         logging.info(zone_name)
         all_recordsets = list_all_resource_record_sets(zone['Id'], zone['Name'])

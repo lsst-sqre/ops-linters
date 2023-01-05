@@ -36,7 +36,7 @@ def list_all_hosted_zones() -> List:
 
     for z in all_zones:
         logging.info(z['Name'])
-    logging.info("Found %d zones" % len(all_zones))
+    logging.info(f"Found {len(all_zones)} zones")
 
     return all_zones
 
@@ -53,7 +53,7 @@ def list_all_resource_record_sets(zone_id, zone_name) -> Dict:
 
     while truncated:
         next_record_name = rs['NextRecordName']
-        logging.info('Getting records starting with %s' % next_record_name)
+        logging.info(f'Getting records starting with {next_record_name}')
         rs = client.list_resource_record_sets(
                 HostedZoneId=zone_id,
                 StartRecordName=next_record_name
@@ -97,11 +97,13 @@ def query_dns_records(zones) -> Dict:
                     for record in records:
                         addresses.append(record['Value'])
 
-                    logging.info("[%s : %s]" % (name, addresses))
+                    logging.info(f"[{name}: {addresses}")
                     lookup[name] = addresses
 
     return lookup
 
 zones = list_all_hosted_zones()
 hosts = query_dns_records(zones)
-logging.info(hosts)
+
+for h in hosts:
+    logging.info(f"{h}: {hosts[h]}")

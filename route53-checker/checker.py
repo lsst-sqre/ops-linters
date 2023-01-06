@@ -30,4 +30,4 @@ logging.info("The following hostnames look good:")
 for h in hosts:
     for address in hosts[h]:
         if address in all_addresses:
-            logging.error(f"{h}: {address}")
+            logging.info(f"{h}: {address}")

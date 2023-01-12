@@ -18,7 +18,6 @@ name: CI
 jobs:
   build:
     runs-on: ubuntu-latest
-    needs: [test]
     timeout-minutes: 15
 
     # Only do Docker builds of tagged releases and pull requests from ticket
@@ -50,8 +49,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: token
+          password: ${{ secrets.GHCR_PUSH_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v3

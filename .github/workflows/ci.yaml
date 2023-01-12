@@ -57,6 +57,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/lsst-sqre/linters:${{ steps.vars.outputs.tag }}
+          tags: ghcr.io/lsst-sqre/ops-linters:${{ steps.vars.outputs.tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

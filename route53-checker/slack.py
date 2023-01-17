@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Coroutine
+from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
 from fastapi import HTTPException, Request, Response
@@ -11,8 +12,6 @@ from fastapi.routing import APIRoute
 from safir.dependencies.http_client import http_client_dependency
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from structlog.stdlib import BoundLogger
-
-from .util import current_datetime
 
 SLACK_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 """Date format to use for dates in Slack alerts."""
@@ -25,6 +24,11 @@ __all__ = [
     "SlackRouteErrorHandler",
     "initialize_slack_alerts",
 ]
+
+
+def current_datetime() -> datetime:
+    """Return the current time without microseconds."""
+    return datetime.now(tz=timezone.utc).replace(microsecond=0)
 
 
 class SlackIgnoredException(Exception):

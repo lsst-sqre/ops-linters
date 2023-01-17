@@ -17,7 +17,7 @@ known_subnets = [
 async def run_checker():
     # Slack client for sending alerts
     logger = structlog.get_logger("dns-linter")
-    webhook = os.getenv('SLACK_WEBHOOK')
+    webhook = os.getenv('SLACK_WEBHOOK', '')
 
     slack_client = SlackAlertClient(webhook, 'DNS linter', logger)
 
@@ -61,12 +61,14 @@ async def run_checker():
         # Slack will truncate messages of over 3000 characters,
         # so we have to send multiple messages
         if len(next_dangler) + len(dangling_alert) > 3000:
-            await slack_client.message(dangling_alert)
+            if webhook:
+                await slack_client.message(dangling_alert)
             dangling_alert = "Continuing dangling names:\n" + next_dangler
         else:
             dangling_alert += next_dangler
 
-    await slack_client.message(dangling_alert)
+    if webhook:
+        await slack_client.message(dangling_alert)
 
 if __name__ == "__main__":
     asyncio.run(run_checker())

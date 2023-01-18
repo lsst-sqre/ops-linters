@@ -11,8 +11,8 @@ credentials = GoogleCredentials.get_application_default()
 service = discovery.build('compute', 'v1', credentials=credentials)
 
 projects = [
-    'science-platform-stable-6994',
     'science-platform-int-dc5d',
+    'science-platform-stable-6994',
     'science-platform-dev-7696',
     'plasma-geode-127520',
 ]

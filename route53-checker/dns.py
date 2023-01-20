@@ -40,6 +40,7 @@ def list_all_hosted_zones() -> List:
 
     return all_zones
 
+
 def list_all_resource_record_sets(zone_id, zone_name) -> Dict:
     """Returns all the resource record sets, including if they are
     truncated and we have to make another request."""
@@ -64,7 +65,6 @@ def list_all_resource_record_sets(zone_id, zone_name) -> Dict:
         for r in rs['ResourceRecordSets']:
             all_recordsets.append(r)
 
-
     return all_recordsets
 
 
@@ -84,7 +84,10 @@ def query_dns_records(zones) -> Dict:
             continue
 
         logging.info(zone_name)
-        all_recordsets = list_all_resource_record_sets(zone['Id'], zone['Name'])
+        all_recordsets = list_all_resource_record_sets(
+                zone['Id'],
+                zone['Name']
+        )
 
         for recordset in all_recordsets:
             if 'ResourceRecords' in recordset:
@@ -101,6 +104,7 @@ def query_dns_records(zones) -> Dict:
                     lookup[name] = addresses
 
     return lookup
+
 
 if __name__ == "__main__":
     zones = list_all_hosted_zones()

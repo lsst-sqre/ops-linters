@@ -10,9 +10,10 @@ from slack import SlackAlertClient
 logging.basicConfig(level=logging.INFO)
 
 known_subnets = [
-    '140.252.', # NOAO Tucson IP Subnet
-    '139.229.', # NOAO Tucson IP Subnet
+    '140.252.',  # NOAO Tucson IP Subnet
+    '139.229.',  # NOAO Tucson IP Subnet
 ]
+
 
 async def run_checker():
     # Slack client for sending alerts
